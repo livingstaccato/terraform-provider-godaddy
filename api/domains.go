@@ -109,6 +109,28 @@ func (c *Client) UpdateDomainRecords(customerID, domain string, records []*Domai
 	return nil
 }
 
+// UpdateNameServers updates the name servers for a specific domain
+func (c *Client) UpdateNameServers(customerID, domain string, nameServers []string) error {
+    // Construct the URL for the nameServers endpoint
+    nsURL := fmt.Sprintf("%s/v1/domains/%s/nameServers", c.baseURL, domain)
+
+    // Create the payload
+    payload := map[string][]string{"nameServers": nameServers}
+    body, err := json.Marshal(payload)
+    if err != nil {
+        return fmt.Errorf("error marshalling nameservers payload: %s", err)
+    }
+
+    // Create the request
+    req, err := http.NewRequest(http.MethodPut, nsURL, bytes.NewBuffer(body))
+    if err != nil {
+        return fmt.Errorf("error creating request for updating nameservers: %s", err)
+    }
+
+    // Execute the request
+    return c.execute(customerID, req, nil)
+}
+
 func (c *Client) domainRecordsOfType(t string, records []*DomainRecord) []*DomainRecord {
 	typeRecords := make([]*DomainRecord, 0)
 
